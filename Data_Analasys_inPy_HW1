@@ -1,0 +1,147 @@
+import numpy as np, pandas as pd, matplotlib.pyplot as plt, seaborn as sns
+
+# Q1
+'''
+# 1.1
+x = list(range(1, 11))
+print(x)
+# 1.2
+newX = list(range(1, 2*len(x)-1))
+print(sum(newX)**0.5)
+'''
+
+# Q2
+'''
+# 2.1
+x = list(2**i for i in range(0, int(np.log2(1024)+1)))
+print(x)
+# 2.2
+print(sum((3*i+(2*i)**2) for i in range(1, 21)))
+'''
+
+# Q3
+'''
+a1, a2, b1, b2 = [4, 3], [1.25, 1.75], [1.5, 5, 2, 3, 0], [2, 1.5, 4, 3, 5]
+d1 = sum((x1-x2)**2 for x1, x2 in zip(a1, a2))**0.5
+d2 = sum((x1-x2)**2 for x1, x2 in zip(b1, b2))**0.5
+print('d1 = {n} \nd2 = {m}'.format(n=d1, m=d2))
+'''
+
+# Q4
+'''
+# 4.1
+surveyData = pd.DataFrame({'id': list(range(1, 7)),
+                           'age': [30, 21, 50, 48, 25, np.nan],
+                           'gender': ['M', 'F', 'M', 'M', 'M', 'F'],
+                           'merital': ['single', 'married', 'married', 'single', 'divorced', 'single'],
+                           'bodys': ['fat', 'thin', 'medium', 'medium', 'medium', 'medium'],
+                           'height': [170, 164, 168, 180, 195, 177]})
+# 4.2.1
+num3 = surveyData.ix[2]
+num3.name = 'Survey 3'
+print(num3)
+# 4.2.2
+print(surveyData[surveyData['gender'] == 'F'])
+# 4.2.3
+print(surveyData[(surveyData.index != 1) & (surveyData.index != 4)])
+# 4.2.4
+print(surveyData[['gender', 'merital']])
+# 4.2.5
+print(surveyData[(surveyData['gender'] == 'M') & (surveyData['height'] > 175)])
+# 4.3
+print('sum of survey age: {n}'.format(n=np.nansum(surveyData['age'])/len(surveyData)))
+'''
+
+# Q5
+#beerPref = pd.read_csv(filepath_or_buffer=r"C:\Users\Nathaniel\Downloads\Beer.csv")
+
+# 5.1 gender, Beer_Preference
+'''
+bTable = beerPref['Beer_Preference'].value_counts()
+print(beerTable)
+'''
+
+# 5.2
+'''
+fig, ax1, ax2 = plt.figure(), plt.subplot2grid((1, 2), (0, 0)), plt.subplot2grid((1, 2), (0, 1))
+
+bTable.plot(kind='bar', ax=ax1, title='Beer_Preference')
+ax1.set_xlabel('Type')
+ax1.set_ylabel('Count')
+
+bTable.plot(kind='barh', title='Beer_Preference', ax=ax2)
+ax2.set_ylabel('Type')
+ax2.set_xlabel('Count')
+plt.show()
+'''
+# 5.3
+'''
+tab1 = beerPref.groupby('gender')['Beer_Preference'].value_counts().unstack()
+print("{n} women prefer dark beer.".format(n=tab1.ix[0, 0]))
+'''
+
+# 5.4
+'''
+print("{n}% students prefer light beer.".format(n=(sum(tab1.Light)/sum(tab1.sum()))*100))
+print("{n}% female students prefer light beer. \n{x}% male students prefer light beer.".format(n=round((tab1.ix[0, 1]/sum(tab1.ix[0]))*100, 2), x=round(((tab1.ix[1, 1]/sum(tab1.ix[1]))*100), 2)))
+print("{n}% of students that prefer dark beer, are male.".format(n=round((tab1.ix[1, 0]/sum(tab1.Dark))*100, 2)))
+'''
+
+# 5.5
+'''
+tab2 = tab1.copy()
+tab2['Dark'] = round((tab2['Dark']/sum(tab2.sum()))*100, 2)
+tab2['Light'] = round((tab2['Light']/sum(tab2.sum()))*100, 2)
+tab2['Regular'] = round((tab2['Regular']/sum(tab2.sum()))*100, 2)
+print(tab2)
+fig, ax = plt.figure(), plt.subplot2grid((1, 1), (0, 0))
+tab2.plot(kind='bar', stacked=True, ax=ax, title='Beer Preference by Gender')
+ax.set_xlabel('Gender')
+ax.set_ylabel('Percentage')
+plt.show()
+'''
+
+# Q6
+#cars = pd.read_csv(filepath_or_buffer=r'C:\Users\Nathaniel\Downloads\cars.csv')
+# 6.1
+#print('There are {n} cars with the values of:\n'.format(n=str(len(cars))) + str(list(cars)))
+# 6.2
+'''
+fig, ax1, ax2 = plt.figure(), plt.subplot2grid((1, 2), (0, 0), rowspan=1, colspan=1), plt.subplot2grid((1, 2), (0, 1), rowspan=1, colspan=1)
+fig.suptitle('MPG Dist')
+sns.distplot(cars['mpg'], color='red', ax=ax1)
+sns.boxplot(x=cars['mpg'], ax=ax2, color='green')
+plt.show()
+'''
+# 6.3
+'''
+fig, ax1, ax2 = plt.figure(), plt.subplot2grid((1, 2), (0, 0), rowspan=1, colspan=1), plt.subplot2grid((1, 2), (0, 1), rowspan=1, colspan=1)
+fig.suptitle('MPG By Country')
+sns.boxplot(data=cars, x="brand", y="mpg", ax=ax1).set_xticklabels(['US', 'Europe', 'Japan'])
+sns.boxplot(data=cars, y="brand", x="mpg", ax=ax2, orient="h").set_yticklabels(['US', 'Europe', 'Japan'])
+plt.show()
+'''
+# 6.4
+'''
+fig, ax1, ax2, ax3 = plt.figure(), plt.subplot2grid((2, 2), (0, 0)), plt.subplot2grid((2, 2), (0, 1)), plt.subplot2grid((2, 2), (1, 0))
+sns.regplot(x='mpg', y='timeto60', data=cars, fit_reg=False, ax=ax1)
+sns.regplot(x='mpg', y='hp', data=cars, fit_reg=False, ax=ax2)
+sns.regplot(x='mpg', y='weightlbs', data=cars, fit_reg=False, ax=ax3)
+plt.show()
+'''
+# 6.5
+'''
+fig = plt.figure()
+sns.pairplot(cars, vars=['mpg', 'hp', 'weightlbs', 'timeto60'])
+plt.show()
+'''
+
+# Q7
+#passengers = pd.read_csv(filepath_or_buffer=r"C:\Users\Nathaniel\Downloads\passengers.csv")
+'''
+passengers['pass'].plot()
+plt.title('Passengers Time Series Plot')
+plt.ylabel('Passengers')
+plt.xlabel('Time')
+plt.show()
+'''
